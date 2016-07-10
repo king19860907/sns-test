@@ -1,0 +1,112 @@
+<?xml version ="1.0" encoding= "UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+       xsi:schemaLocation="http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.0.xsd
+http://www.springframework.org/schema/data/mongo
+http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd
+http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <mongo:mongo host="127.0.0.1" port="27017" id="memberMongo">
+        <mongo:options connections-per-host="10"
+                       threads-allowed-to-block-for-connection-multiplier="4"
+                       connect-timeout="1000" max-wait-time="1500"
+                       auto-connect-retry="true" socket-timeout="1500" />
+    </mongo:mongo>
+
+    <bean id="userMongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg ref ="memberMongo" />
+        <constructor-arg name ="databaseName" value= "yesmynet"
+        />
+    </bean>
+
+    <mongo:mongo host="127.0.0.1" port="27017" id="followMongo">
+        <mongo:options connections-per-host="10"
+                       threads-allowed-to-block-for-connection-multiplier="4"
+                       connect-timeout="1000" max-wait-time="1500"
+                       auto-connect-retry="true" socket-timeout="1500" />
+    </mongo:mongo>
+
+    <bean id="followMongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg ref ="followMongo" />
+        <constructor-arg name ="databaseName" value= "yesmynet"
+        />
+    </bean>
+
+    <mongo:mongo host="127.0.0.1" port="27017" id="messageMongo">
+        <mongo:options connections-per-host="10"
+                       threads-allowed-to-block-for-connection-multiplier="4"
+                       connect-timeout="1000" max-wait-time="1500"
+                       auto-connect-retry="true" socket-timeout="1500" />
+    </mongo:mongo>
+
+    <bean id="messageMongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg ref ="messageMongo" />
+        <constructor-arg name ="databaseName" value= "yesmynet"
+        />
+    </bean>
+
+    <bean id="followRedisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+        <property name="connectionFactory">
+            <bean class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+                <property name="hostName" value="127.0.0.1" />
+                <property name="port" value="6379" />
+                <property name="poolConfig">
+                    <bean class="redis.clients.jedis.JedisPoolConfig">
+                        <property name="maxActive"  value="200" />
+                        <property name="maxIdle" value="30" />
+                        <property name="minIdle" value="1" />
+                        <property name="maxWait" value="5000" />
+                        <property name="testOnBorrow"  value="true"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+        <property name="KeySerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"></bean>
+        </property>
+        <property name="ValueSerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"></bean>
+        </property>
+    </bean>
+
+    <bean id="memberDao" class="com.majun.sns.repository.dao.MemberDao">
+        <property name="userMongoTemplate" ref="userMongoTemplate"/>
+    </bean>
+
+    <bean id="followDao" class="com.majun.sns.repository.dao.FollowDao">
+        <property name="followMongoTemplate" ref="followMongoTemplate"/>
+        <property name="followRedisTemplate" ref="followRedisTemplate"/>
+    </bean>
+
+    <bean id="snsUserService" class="com.majun.sns.application.impl.SnsUserServiceImpl">
+        <property name="memberDao" ref="memberDao"/>
+        <property name="followDao" ref="followDao"/>
+
+        <property name="afterFollowProcessor">
+            <bean class="com.majun.sns.repository.dao.impl.MainProcess">
+                <property name="processors">
+                    <list>
+                        <bean class="com.majun.sns.repository.dao.impl.SetFollowNum">
+                            <property name="memberMongoTemplate" ref="userMongoTemplate"/>
+                            <property name="followRedisTemplate" ref="followRedisTemplate"/>
+                        </bean>
+                        <bean class="com.majun.sns.repository.dao.impl.SetFansNum">
+                            <property name="memberMongoTemplate" ref="userMongoTemplate"/>
+                            <property name="followRedisTemplate" ref="followRedisTemplate"/>
+                        </bean>
+                        <bean class="com.majun.sns.repository.dao.impl.IncNewFans">
+                            <property name="messageMongoTemplate" ref="messageMongoTemplate"/>
+                        </bean>
+                    </list>
+                </property>
+            </bean>
+        </property>
+
+    </bean>
+
+
+
+</beans>
