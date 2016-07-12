@@ -153,6 +153,10 @@ http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
                             <property name="memberMongoTemplate" ref="userMongoTemplate"/>
                             <property name="postMongoTemplate" ref="postMongoTemplate"/>
                         </bean>
+                        <bean class="com.majun.sns.repository.dao.impl.IncArticleOrGoodsNum">
+                            <property name="messageMongoTemplate" ref="messageMongoTemplate"/>
+                            <property name="followDao" ref="followDao"/>
+                        </bean>
                     </list>
                 </property>
             </bean>

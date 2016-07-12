@@ -24,7 +24,7 @@ public class SnsPostServiceTest {
     SnsUserService snsUserService;
 
     @Test
-    public void postArticle(){
+    public void postArticle() throws InterruptedException {
         Post post = new Post();
         post.setContent("content1");
         post.setCover("cover1");
@@ -37,6 +37,7 @@ public class SnsPostServiceTest {
         post.setMember(member);
 
         System.out.println(snsPostService.post(post));
+        Thread.sleep(10000);
     }
 
     @Test
