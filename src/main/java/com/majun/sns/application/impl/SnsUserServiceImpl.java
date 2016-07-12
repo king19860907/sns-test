@@ -26,10 +26,15 @@ public class SnsUserServiceImpl implements SnsUserService {
 
     private AfterProcessor afterUnFollowProcessor;
 
+    private AfterProcessor afterSaveMemberProcessor;
+
     public void saveMemberInfo(Member member) {
 
         memberDao.saveMember(member);
 
+        ProcessParam param = new ProcessParam();
+        param.setFromMemberId(member.getId());
+        afterSaveMemberProcessor.execute(param);
     }
 
     public Member getMemberInfo(Long memberId) {
@@ -102,5 +107,9 @@ public class SnsUserServiceImpl implements SnsUserService {
 
     public void setAfterUnFollowProcessor(AfterProcessor afterUnFollowProcessor) {
         this.afterUnFollowProcessor = afterUnFollowProcessor;
+    }
+
+    public void setAfterSaveMemberProcessor(AfterProcessor afterSaveMemberProcessor) {
+        this.afterSaveMemberProcessor = afterSaveMemberProcessor;
     }
 }

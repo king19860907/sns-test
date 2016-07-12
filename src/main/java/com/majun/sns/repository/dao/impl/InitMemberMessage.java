@@ -4,21 +4,24 @@ import com.majun.sns.dto.ProcessParam;
 import com.majun.sns.model.MemberMessage;
 import com.majun.sns.repository.dao.AfterProcessor;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 /**
- * Created by majun on 2016/7/10.
+ * Created by majun on 16/7/13.
  */
-public class IncNewFans implements AfterProcessor {
+public class InitMemberMessage implements AfterProcessor {
 
     private MongoTemplate messageMongoTemplate;
 
     public void execute(ProcessParam param) {
-        Update update = new Update();
-        update.inc("newFansNum",1);
-        messageMongoTemplate.updateMulti(Query.query(Criteria.where("memberId").is(param.getToMemberId())),update, MemberMessage.class);
+
+        if(param.getFromMemberId() != null){
+            MemberMessage message = new MemberMessage();
+            message.setMemberId(param.getFromMemberId());
+            messageMongoTemplate.save(message);
+
+        }
+
     }
 
     public void setMessageMongoTemplate(MongoTemplate messageMongoTemplate) {

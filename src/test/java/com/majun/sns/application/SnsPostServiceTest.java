@@ -41,19 +41,20 @@ public class SnsPostServiceTest {
     }
 
     @Test
-    public void postGoods(){
+    public void postGoods() throws InterruptedException {
         Post post = new Post();
         post.setContent("content1");
         post.setCover("cover1");
         post.setCreateTime(new Date());
         post.setTitle("title1");
         post.setType("goods");
-        post.setMemberId(2000L);
+        post.setMemberId(1002L);
 
         Member member = snsUserService.getMemberInfo(post.getMemberId());
         post.setMember(member);
 
         System.out.println(snsPostService.post(post));
+        Thread.sleep(10000);
     }
 
 }
