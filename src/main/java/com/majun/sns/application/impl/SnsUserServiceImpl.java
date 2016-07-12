@@ -1,6 +1,7 @@
 package com.majun.sns.application.impl;
 
 import com.majun.sns.application.SnsUserService;
+import com.majun.sns.dto.FollowStatus;
 import com.majun.sns.dto.ProcessParam;
 import com.majun.sns.model.Member;
 import com.majun.sns.repository.dao.AfterProcessor;
@@ -23,6 +24,8 @@ public class SnsUserServiceImpl implements SnsUserService {
 
     private AfterProcessor afterFollowProcessor;
 
+    private AfterProcessor afterUnFollowProcessor;
+
     public void saveMemberInfo(Member member) {
 
         memberDao.saveMember(member);
@@ -34,15 +37,27 @@ public class SnsUserServiceImpl implements SnsUserService {
     }
 
     public void follow(Long memberId,Long toMemberid) {
-        followDao.follow(memberId,toMemberid);
-        ProcessParam param = new ProcessParam();
-        param.setFromMemberId(memberId);
-        param.setToMemberId(toMemberid);
-        afterFollowProcessor.execute(param);
+        FollowStatus status = followDao.followStatus(memberId,toMemberid);
+        if(status.equals(FollowStatus.NONE) || status.equals(FollowStatus.FANS)){
+            followDao.follow(memberId,toMemberid);
+            ProcessParam param = new ProcessParam();
+            param.setFromMemberId(memberId);
+            param.setToMemberId(toMemberid);
+            afterFollowProcessor.execute(param);
+        }
+
     }
 
     public void unFollow(Long memberId,Long toMemberId) {
-        followDao.unFollow(memberId,toMemberId);
+        FollowStatus status = followDao.followStatus(memberId,toMemberId);
+        if(status.equals(FollowStatus.EACH) || status.equals(FollowStatus.FOLLOW)) {
+            followDao.unFollow(memberId, toMemberId);
+
+            ProcessParam param = new ProcessParam();
+            param.setFromMemberId(memberId);
+            param.setToMemberId(toMemberId);
+            afterUnFollowProcessor.execute(param);
+        }
     }
 
     public List<Member> getFollows(Long memberId,long pageNum,long pageSize) {
@@ -83,5 +98,9 @@ public class SnsUserServiceImpl implements SnsUserService {
 
     public void setAfterFollowProcessor(AfterProcessor afterFollowProcessor) {
         this.afterFollowProcessor = afterFollowProcessor;
+    }
+
+    public void setAfterUnFollowProcessor(AfterProcessor afterUnFollowProcessor) {
+        this.afterUnFollowProcessor = afterUnFollowProcessor;
     }
 }

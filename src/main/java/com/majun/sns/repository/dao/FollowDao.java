@@ -1,5 +1,6 @@
 package com.majun.sns.repository.dao;
 
+import com.majun.sns.dto.FollowStatus;
 import com.majun.sns.model.Follow;
 import com.yesmynet.base.closure.ClosureUtils;
 import com.yesmynet.base.closure.ClosureValue;
@@ -77,6 +78,19 @@ public class FollowDao {
             }
         });
         return  ids;
+    }
+
+    public FollowStatus followStatus(Long fromMemberId,Long toMemberId){
+        Long fromFollowTo=followRedisTemplate.boundZSetOps(follows_key+fromMemberId).rank(String.valueOf(toMemberId));
+        Long toFollowFrom = followRedisTemplate.boundZSetOps(follows_key+toMemberId).rank(String.valueOf(fromMemberId));
+        if(fromFollowTo != null && toFollowFrom != null){
+            return FollowStatus.EACH;
+        }else if (fromFollowTo != null && toFollowFrom == null){
+            return FollowStatus.FOLLOW;
+        }else if (fromFollowTo == null && toFollowFrom != null){
+            return FollowStatus.FANS;
+        }
+        return FollowStatus.NONE;
     }
 
     public void setFollowMongoTemplate(MongoTemplate followMongoTemplate) {

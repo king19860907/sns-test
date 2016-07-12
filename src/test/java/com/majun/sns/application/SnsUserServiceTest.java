@@ -67,12 +67,12 @@ public class SnsUserServiceTest {
 
     @Test
     public void follow(){
-        snsUserService.follow(1001L,1002L);
+        snsUserService.follow(1002L,1001L);
     }
 
     @Test
     public void unFollow(){
-        snsUserService.unFollow(1001L,1002L);
+        snsUserService.unFollow(1002L,1001L);
     }
 
     @Test

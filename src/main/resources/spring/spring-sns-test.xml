@@ -105,6 +105,23 @@ http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
             </bean>
         </property>
 
+        <property name="afterUnFollowProcessor">
+            <bean class="com.majun.sns.repository.dao.impl.MainProcess">
+                <property name="processors">
+                    <list>
+                        <bean class="com.majun.sns.repository.dao.impl.SetFollowNum">
+                            <property name="memberMongoTemplate" ref="userMongoTemplate"/>
+                            <property name="followRedisTemplate" ref="followRedisTemplate"/>
+                        </bean>
+                        <bean class="com.majun.sns.repository.dao.impl.SetFansNum">
+                            <property name="memberMongoTemplate" ref="userMongoTemplate"/>
+                            <property name="followRedisTemplate" ref="followRedisTemplate"/>
+                        </bean>
+                    </list>
+                </property>
+            </bean>
+        </property>
+
     </bean>
 
 
