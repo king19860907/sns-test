@@ -4,6 +4,7 @@ import com.majun.sns.dto.Operation;
 import com.majun.sns.dto.PostType;
 import com.majun.sns.model.Member;
 import com.majun.sns.model.Post;
+import org.bson.types.ObjectId;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -132,6 +133,18 @@ public class SnsPostServiceTest {
         List<Post> list = snsPostService.queryPost(2000L,PostType.article,1607131454155031011L,Operation.gt,5);
         System.out.println(list);
         System.out.println(list.size());
+    }
+
+    @Test
+    public void comment(){
+
+        snsPostService.comment(1001L,1607131454155101013L,null,"content2");
+
+    }
+
+    @Test
+    public void reply(){
+        snsPostService.comment(1002L,1607131454155101013L,new ObjectId("5786106677c840c2b437768b"),"content3");
     }
 
 }

@@ -3,6 +3,7 @@ package com.majun.sns.application;
 import com.majun.sns.dto.Operation;
 import com.majun.sns.dto.PostType;
 import com.majun.sns.model.Post;
+import org.bson.types.ObjectId;
 
 import java.util.List;
 
@@ -32,6 +33,15 @@ public interface SnsPostService {
      * @return
      */
     List<Post> queryPost(Long memberId,PostType type, Long postId, Operation postIdOperation, int size);
+
+    /**
+     * 发表评论
+     * @param memberId  用户id
+     * @param postId    内容id
+     * @param replyId   所回复的评论的id
+     * @param content   内容
+     */
+    void comment(Long memberId,Long postId,ObjectId replyId,String content);
 
     void getComments();
 

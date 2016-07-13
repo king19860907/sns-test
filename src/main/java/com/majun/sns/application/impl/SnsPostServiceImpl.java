@@ -4,15 +4,14 @@ import com.majun.sns.application.SnsPostService;
 import com.majun.sns.dto.Operation;
 import com.majun.sns.dto.PostType;
 import com.majun.sns.dto.ProcessParam;
+import com.majun.sns.model.Comment;
 import com.majun.sns.model.Member;
 import com.majun.sns.model.Post;
-import com.majun.sns.repository.dao.AfterProcessor;
-import com.majun.sns.repository.dao.FollowDao;
-import com.majun.sns.repository.dao.MemberDao;
-import com.majun.sns.repository.dao.PostDao;
+import com.majun.sns.repository.dao.*;
 import com.majun.sns.util.DateUtil;
 import com.yesmynet.base.closure.ClosureUtils;
 import com.yesmynet.base.closure.ClosureValue;
+import org.bson.types.ObjectId;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -30,6 +29,8 @@ public class SnsPostServiceImpl implements SnsPostService {
     private FollowDao followDao;
 
     private MemberDao memberDao;
+
+    private CommentDao commentDao;
 
     private AfterProcessor afterPostProcessor;
 
@@ -68,6 +69,19 @@ public class SnsPostServiceImpl implements SnsPostService {
         });
 
         return posts;
+    }
+
+    public void comment(Long memberId,Long postId,ObjectId replyId,String content) {
+        Comment comment = new Comment();
+        comment.setMemberId(memberId);
+        comment.setPostId(postId);
+        comment.setContent(content);
+        comment.setCreateTime(new Date());
+        if(replyId != null){
+            Comment replyComment = commentDao.getComment(replyId);
+            comment.setReplyComment(replyComment);
+        }
+        commentDao.save(comment);
     }
 
     public void getComments() {
@@ -120,5 +134,9 @@ public class SnsPostServiceImpl implements SnsPostService {
 
     public void setAfterPostProcessor(AfterProcessor afterPostProcessor) {
         this.afterPostProcessor = afterPostProcessor;
+    }
+
+    public void setCommentDao(CommentDao commentDao) {
+        this.commentDao = commentDao;
     }
 }
