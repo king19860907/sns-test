@@ -1,5 +1,7 @@
 package com.majun.sns.application;
 
+import com.majun.sns.dto.Operation;
+import com.majun.sns.dto.PostType;
 import com.majun.sns.model.Member;
 import com.majun.sns.model.Post;
 import org.junit.Test;
@@ -9,6 +11,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by majun on 16/7/12.
@@ -19,6 +22,9 @@ public class SnsPostServiceTest {
 
     @Resource(name="snsPostService")
     SnsPostService snsPostService;
+
+    @Resource(name="snsPostService")
+    SnsPostService snsPostService2;
 
     @Resource(name="snsUserService")
     SnsUserService snsUserService;
@@ -55,6 +61,77 @@ public class SnsPostServiceTest {
 
         System.out.println(snsPostService.post(post));
         Thread.sleep(10000);
+    }
+
+    @Test
+    public void postBatch() throws InterruptedException {
+
+        //1002 发布两条文章
+        new Thread(){
+            @Override
+            public void run() {
+                post(1002L,1,"article",snsPostService);
+                post(1002L,2,"article",snsPostService);
+            }
+        }.start();
+
+
+        //1003 发布1条文章 1条酒评
+        new Thread(){
+            @Override
+            public void run() {
+                post(1003L,1,"article",snsPostService2);
+                post(1003L,1,"goods",snsPostService2);
+            }
+        }.start();
+
+
+        //2000 发布5条文章 5条酒评
+        new Thread(){
+            @Override
+            public void run() {
+                for(int i =1;i<=5;i++){
+                    post(2000L,i,"article",snsPostService);
+                    post(2000L,i,"goods",snsPostService2);
+                }
+            }
+        }.start();
+
+        Thread.sleep(20000);
+
+    }
+
+    private void post(long memberId,int i,String type,SnsPostService service){
+
+        Post post = new Post();
+        post.setContent("content_"+memberId+"_"+i+Thread.currentThread().getName());
+        post.setCover("cover");
+        post.setCreateTime(new Date());
+        post.setTitle("title_"+memberId+"_"+i);
+        post.setType(type);
+        post.setMemberId(memberId);
+
+        Member member = snsUserService.getMemberInfo(post.getMemberId());
+        post.setMember(member);
+
+        System.out.println(service.post(post));
+
+    }
+
+
+    @Test
+    public void queryFollowPosts(){
+
+        List<Post> list = snsPostService.queryFollowPosts(1001L, PostType.article,1607131454154871007L, Operation.lt,1002);
+        System.out.println(list);
+        System.out.println(list.size());
+    }
+
+    @Test
+    public void queryPosts(){
+        List<Post> list = snsPostService.queryPost(2000L,PostType.article,1607131454155031011L,Operation.gt,5);
+        System.out.println(list);
+        System.out.println(list.size());
     }
 
 }

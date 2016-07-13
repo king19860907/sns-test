@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Created by majun on 16/7/12.
  */
-public class IncArticleOrGoodsNum implements AfterProcessor {
+public class IncNewArticleOrGoodsNum implements AfterProcessor {
 
     private MongoTemplate messageMongoTemplate;
 

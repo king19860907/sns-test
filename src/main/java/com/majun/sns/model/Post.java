@@ -128,4 +128,21 @@ public class Post implements Serializable {
     public void setMember(Member member) {
         this.member = member;
     }
+
+    @Override
+    public String toString() {
+        return "Post{" +
+                "content='" + content + '\'' +
+                ", cover='" + cover + '\'' +
+                ", createTime=" + createTime +
+                ", id=" + id +
+                ", likeNum=" + likeNum +
+                ", member=" + member +
+                ", memberId=" + memberId +
+                ", postId=" + postId +
+                ", replyNum=" + replyNum +
+                ", title='" + title + '\'' +
+                ", type='" + type + '\'' +
+                '}';
+    }
 }

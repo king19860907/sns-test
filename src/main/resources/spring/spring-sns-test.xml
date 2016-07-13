@@ -156,6 +156,8 @@ http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
     <bean id="snsPostService" class="com.majun.sns.application.impl.SnsPostServiceImpl">
         <property name="postDao" ref="postDao"/>
+        <property name="followDao" ref="followDao"/>
+        <property name="memberDao" ref="memberDao"/>
 
         <property name="afterPostProcessor">
             <bean class="com.majun.sns.repository.dao.impl.MainProcess">
@@ -165,7 +167,7 @@ http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
                             <property name="memberMongoTemplate" ref="userMongoTemplate"/>
                             <property name="postMongoTemplate" ref="postMongoTemplate"/>
                         </bean>
-                        <bean class="com.majun.sns.repository.dao.impl.IncArticleOrGoodsNum">
+                        <bean class="com.majun.sns.repository.dao.impl.IncNewArticleOrGoodsNum">
                             <property name="messageMongoTemplate" ref="messageMongoTemplate"/>
                             <property name="followDao" ref="followDao"/>
                         </bean>
