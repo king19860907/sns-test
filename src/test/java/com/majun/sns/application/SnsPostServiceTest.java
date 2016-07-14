@@ -2,11 +2,18 @@ package com.majun.sns.application;
 
 import com.majun.sns.dto.Operation;
 import com.majun.sns.dto.PostType;
+import com.majun.sns.dto.Result;
+import com.majun.sns.model.Comment;
 import com.majun.sns.model.Member;
 import com.majun.sns.model.Post;
+import com.mongodb.Mongo;
 import org.bson.types.ObjectId;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.omg.CORBA.Request;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.BasicQuery;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -29,6 +36,9 @@ public class SnsPostServiceTest {
 
     @Resource(name="snsUserService")
     SnsUserService snsUserService;
+
+    @Resource(name="commentMongoTemplate")
+    MongoTemplate commentMongoTemplate;
 
     @Test
     public void postArticle() throws InterruptedException {
@@ -146,5 +156,24 @@ public class SnsPostServiceTest {
     public void reply(){
         snsPostService.comment(1002L,1607131454155101013L,new ObjectId("5786106677c840c2b437768b"),"content3");
     }
+
+
+    @Test
+    public void getComments(){
+        Result<Comment> request = snsPostService.getComments(1607131454155101013L,3,2);
+        System.out.println(request);
+        System.out.println(request.getResult().get(0).getMember());
+        System.out.println(snsPostService.getComments(1607131454155101013L,4,2));
+
+    }
+
+    @Test
+    public void test(){
+
+        //System.out.println(commentMongoTemplate.findAll(Comment.class));;
+        Query query = new BasicQuery("{memberId:1002}");
+        System.out.println(commentMongoTemplate.find(query,Comment.class));
+    }
+
 
 }

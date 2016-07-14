@@ -2,6 +2,7 @@ package com.majun.sns.application;
 
 import com.majun.sns.dto.Operation;
 import com.majun.sns.dto.PostType;
+import com.majun.sns.dto.Result;
 import com.majun.sns.model.Post;
 import org.bson.types.ObjectId;
 
@@ -43,7 +44,7 @@ public interface SnsPostService {
      */
     void comment(Long memberId,Long postId,ObjectId replyId,String content);
 
-    void getComments();
+    Result getComments(Long postId,int pageNum,int pageSize);
 
     void getCollections();
 

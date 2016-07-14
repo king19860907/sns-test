@@ -86,4 +86,12 @@ public class Comment implements Serializable {
     public void setPostId(Long postId) {
         this.postId = postId;
     }
+
+    @Override
+    public String toString() {
+        return "Comment{" +
+                "postId=" + postId +
+                ", commentId=" + commentId +
+                '}';
+    }
 }

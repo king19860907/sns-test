@@ -4,14 +4,18 @@ import com.majun.sns.application.SnsPostService;
 import com.majun.sns.dto.Operation;
 import com.majun.sns.dto.PostType;
 import com.majun.sns.dto.ProcessParam;
+import com.majun.sns.dto.Result;
 import com.majun.sns.model.Comment;
 import com.majun.sns.model.Member;
 import com.majun.sns.model.Post;
 import com.majun.sns.repository.dao.*;
 import com.majun.sns.util.DateUtil;
+import com.sun.corba.se.spi.orbutil.closure.Closure;
 import com.yesmynet.base.closure.ClosureUtils;
 import com.yesmynet.base.closure.ClosureValue;
 import org.bson.types.ObjectId;
+import org.omg.CORBA.Request;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -84,8 +88,24 @@ public class SnsPostServiceImpl implements SnsPostService {
         commentDao.save(comment);
     }
 
-    public void getComments() {
+    public Result<Comment> getComments(Long postId,int pageNum,int pageSize) {
+        Result<Comment> result = commentDao.queryComments(postId,pageNum,pageSize);
+        if(!CollectionUtils.isEmpty(result.getResult())){
+            List<Long> memberIds = ClosureUtils.getValue(result.getResult(), new ClosureValue<Comment, Long>() {
+                public Long getValue(Comment comment) {
+                    return comment.getMemberId();
+                }
+            });
+            final Map<Long,Member> memberMap = memberDao.findMembers(memberIds);
+            List<Comment> list = ClosureUtils.getValue(result.getResult(), new ClosureValue<Comment, Comment>() {
+                public Comment getValue(Comment comment) {
+                    comment.setMember(memberMap.get(comment.getMemberId()));
+                    return comment;
+                }
+            });
+        }
 
+        return result;
     }
 
     public void getCollections() {
