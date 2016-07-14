@@ -99,7 +99,7 @@ public class SnsPostServiceImpl implements SnsPostService {
                 }
             });
             final Map<Long,Member> memberMap = memberDao.findMembers(memberIds);
-            List<Comment> list = ClosureUtils.getValue(result.getResult(), new ClosureValue<Comment, Comment>() {
+            ClosureUtils.getValue(result.getResult(), new ClosureValue<Comment, Comment>() {
                 public Comment getValue(Comment comment) {
                     if(comment.getReplyComment() != null){
                         comment.getReplyComment().setMember(memberMap.get(comment.getReplyComment().getMemberId()));
