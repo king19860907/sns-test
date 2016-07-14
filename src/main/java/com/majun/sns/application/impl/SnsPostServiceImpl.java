@@ -17,10 +17,7 @@ import org.bson.types.ObjectId;
 import org.omg.CORBA.Request;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -91,14 +88,22 @@ public class SnsPostServiceImpl implements SnsPostService {
     public Result<Comment> getComments(Long postId,int pageNum,int pageSize) {
         Result<Comment> result = commentDao.queryComments(postId,pageNum,pageSize);
         if(!CollectionUtils.isEmpty(result.getResult())){
-            List<Long> memberIds = ClosureUtils.getValue(result.getResult(), new ClosureValue<Comment, Long>() {
+            final List<Long> memberIds = new ArrayList<Long>(2*pageSize);
+            ClosureUtils.getValue(result.getResult(), new ClosureValue<Comment, Long>() {
                 public Long getValue(Comment comment) {
+                    memberIds.add(comment.getMemberId());
+                    if(comment.getReplyComment() != null){
+                        memberIds.add(comment.getReplyComment().getMemberId());
+                    }
                     return comment.getMemberId();
                 }
             });
             final Map<Long,Member> memberMap = memberDao.findMembers(memberIds);
             List<Comment> list = ClosureUtils.getValue(result.getResult(), new ClosureValue<Comment, Comment>() {
                 public Comment getValue(Comment comment) {
+                    if(comment.getReplyComment() != null){
+                        comment.getReplyComment().setMember(memberMap.get(comment.getReplyComment().getMemberId()));
+                    }
                     comment.setMember(memberMap.get(comment.getMemberId()));
                     return comment;
                 }

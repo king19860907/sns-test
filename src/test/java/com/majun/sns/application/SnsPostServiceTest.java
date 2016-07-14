@@ -163,6 +163,8 @@ public class SnsPostServiceTest {
         Result<Comment> request = snsPostService.getComments(1607131454155101013L,3,2);
         System.out.println(request);
         System.out.println(request.getResult().get(0).getMember());
+        System.out.println(request.getResult().get(0).getReplyComment());
+        System.out.println(request.getResult().get(0).getReplyComment().getMember());
         System.out.println(snsPostService.getComments(1607131454155101013L,4,2));
 
     }
