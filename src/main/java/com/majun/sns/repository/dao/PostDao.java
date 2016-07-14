@@ -5,6 +5,7 @@ import com.majun.sns.dto.PostType;
 import com.majun.sns.model.Post;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
@@ -43,6 +44,11 @@ public class PostDao {
         query.addCriteria(criteria).limit(size);
         query.with(new Sort(Sort.Direction.DESC,"postId"));
         return postMongoTemplate.find(query,Post.class);
+    }
+
+    public Post getPostById(Long postId){
+        Query query = new BasicQuery("{postId:"+postId+"}");
+        return postMongoTemplate.findOne(query,Post.class);
     }
 
     public void setPostMongoTemplate(MongoTemplate postMongoTemplate) {

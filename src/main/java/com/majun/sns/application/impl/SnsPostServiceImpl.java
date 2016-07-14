@@ -141,8 +141,10 @@ public class SnsPostServiceImpl implements SnsPostService {
         return Long.parseLong(postIdStr);
     }
 
-    public void getPost() {
-
+    public Post getPost(Long postId) {
+        Post post = postDao.getPostById(postId);
+        post.setMember(memberDao.getMember(post.getMemberId()));
+        return post;
     }
 
     public void setPostDao(PostDao postDao) {

@@ -50,6 +50,6 @@ public interface SnsPostService {
 
     Long post(Post post);
 
-    void getPost();
+    Post getPost(Long postId);
 
 }
