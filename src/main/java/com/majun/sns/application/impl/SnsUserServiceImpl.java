@@ -37,11 +37,29 @@ public class SnsUserServiceImpl implements SnsUserService {
         afterSaveMemberProcessor.execute(param);
     }
 
-    public Member getMemberInfo(Long memberId) {
-        return memberDao.getMember(memberId);
+    public Member getMemberInfo(Long loginMemberId,Long memberId) {
+        Member member = memberDao.getMember(memberId);
+        if(loginMemberId != null && loginMemberId.longValue() != memberId.longValue()){
+            member.setFollowStatus(followDao.followStatus(loginMemberId,memberId));
+        }
+        return member;
     }
 
-    public void follow(Long memberId,Long toMemberid) {
+    public Map<Long, Member> findMembers(Long loginMemberId, Collection<Long> memberIds) {
+        List<Member> list = memberDao.findMembers(memberIds);
+        if(loginMemberId != null && CollectionUtils.isEmpty(list)){
+            Map<Long,Member> memberMap = new HashMap<Long, Member>();
+            for(Member member : list){
+               if(loginMemberId.longValue() != member.getId().longValue()){
+                   member.setFollowStatus(followDao.followStatus(loginMemberId,member.getId()));
+               }
+                memberMap.put(member.getId(),member);
+            }
+        }
+        return Collections.EMPTY_MAP;
+    }
+
+    public void follow(Long memberId, Long toMemberid) {
         FollowStatus status = followDao.followStatus(memberId,toMemberid);
         if(status.equals(FollowStatus.NONE) || status.equals(FollowStatus.FANS)){
             followDao.follow(memberId,toMemberid);
@@ -65,11 +83,11 @@ public class SnsUserServiceImpl implements SnsUserService {
         }
     }
 
-    public List<Member> getFollows(Long memberId,long pageNum,long pageSize) {
+    public List<Member> getFollows(Long loginMemberId,Long memberId,long pageNum,long pageSize) {
         if (pageNum == 0) pageNum = 1;
         List<Long> ids = followDao.findFollows(memberId,pageNum,pageSize);
         if(!CollectionUtils.isEmpty(ids)){
-            final Map<Long,Member> idMap = memberDao.findMembers(ids);
+            final Map<Long,Member> idMap = this.findMembers(loginMemberId,ids);
             return ClosureUtils.getValue(ids, new ClosureValue<Long,Member>(){
                 public Member getValue(Long id) {
                     return idMap.get(id);
@@ -79,11 +97,11 @@ public class SnsUserServiceImpl implements SnsUserService {
         return Collections.EMPTY_LIST;
     }
 
-    public List<Member> getFans(Long memberId,long pageNum,long pageSize) {
+    public List<Member> getFans(Long loginMemberId,Long memberId,long pageNum,long pageSize) {
         if (pageNum == 0) pageNum = 1;
         List<Long> ids = followDao.findFans(memberId,pageNum,pageSize);
         if(!CollectionUtils.isEmpty(ids)){
-            final Map<Long,Member> idMap = memberDao.findMembers(ids);
+            final Map<Long,Member> idMap = this.findMembers(loginMemberId,ids);
             return ClosureUtils.getValue(ids, new ClosureValue<Long,Member>(){
                 public Member getValue(Long id) {
                     return idMap.get(id);
@@ -91,6 +109,14 @@ public class SnsUserServiceImpl implements SnsUserService {
             });
         }
         return Collections.EMPTY_LIST;
+    }
+
+    public List<Member> getFollows(Long memberId, long pageNum, long pageSize) {
+        return this.getFollows(null,memberId,pageNum,pageSize);
+    }
+
+    public List<Member> getFans(Long memberId, long pageNum, long pageSize) {
+        return this.getFollows(null,memberId,pageNum,pageSize);
     }
 
     public void setMemberDao(MemberDao memberDao) {

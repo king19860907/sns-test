@@ -15,6 +15,7 @@ public interface SnsPostService {
 
     /**
      * 查询某个用户关注人发布的内容
+     * @param loginMemberId //当前登录的用户  如果为空或者和memberId相同则返回的用户信息中关注关系为NONE
      * @param memberId
      * @param type      类型:酒评还是文章
      * @param postId    内容Id
@@ -22,10 +23,13 @@ public interface SnsPostService {
      * @param size
      * @return
      */
+    List<Post> queryFollowPosts(Long loginMemberId,Long memberId, PostType type, Long postId , Operation postIdOperation,int size);
+
     List<Post> queryFollowPosts(Long memberId, PostType type, Long postId , Operation postIdOperation,int size);
 
     /**
      * 查询某个用户发布的内容
+     * @param  loginMemberId //当前登录的用户  如果为空或者和memberId相同则返回的用户信息中关注关系为NONE
      * @param memberId
      * @param type      类型:酒评还是文章
      * @param postId    内容Id
@@ -33,6 +37,8 @@ public interface SnsPostService {
      * @param size
      * @return
      */
+    List<Post> queryPost(Long loginMemberId,Long memberId,PostType type, Long postId, Operation postIdOperation, int size);
+
     List<Post> queryPost(Long memberId,PostType type, Long postId, Operation postIdOperation, int size);
 
     /**
@@ -43,6 +49,16 @@ public interface SnsPostService {
      * @param content   内容
      */
     void comment(Long memberId,Long postId,ObjectId replyId,String content);
+
+    /**
+     *
+     * @param loginMemberId //当前登录的用户  如果为空或者和memberId相同则返回的用户信息中关注关系为NONE
+     * @param postId
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    Result getComments(Long loginMemberId,Long postId,int pageNum,int pageSize);
 
     Result getComments(Long postId,int pageNum,int pageSize);
 
@@ -59,6 +75,12 @@ public interface SnsPostService {
 
     Long post(Post post);
 
-    Post getPost(Long postId);
+    /**
+     * //当前登录的用户  如果为空或者和memberId相同则返回的用户信息中关注关系为NONE
+     * @param loginMemberId
+     * @param postId
+     * @return
+     */
+    Post getPost(Long loginMemberId,Long postId);
 
 }

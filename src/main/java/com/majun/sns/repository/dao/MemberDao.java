@@ -27,7 +27,15 @@ public class MemberDao {
         return userMongoTemplate.findOne(query,Member.class);
     }
 
-    public Map<Long,Member> findMembers(Collection<Long> ids){
+    public List<Member> findMembers(Collection<Long> ids){
+        Criteria criteria = new Criteria();
+        criteria.and("_id").in(ids);
+        Query query = new Query();
+        query.addCriteria(criteria);
+        return userMongoTemplate.find(query,Member.class);
+    }
+
+   /* public Map<Long,Member> findMembers(Collection<Long> ids){
         Criteria criteria = new Criteria();
         criteria.and("_id").in(ids);
         Query query = new Query();
@@ -41,7 +49,7 @@ public class MemberDao {
             return idMap;
         }
         return Collections.EMPTY_MAP;
-    }
+    }*/
 
     public void setUserMongoTemplate(MongoTemplate userMongoTemplate) {
         this.userMongoTemplate = userMongoTemplate;

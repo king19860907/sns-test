@@ -61,7 +61,7 @@ public class SnsUserServiceTest {
 
     @Test
     public void getMember(){
-        Member member = snsUserService.getMemberInfo(1001L);
+        Member member = snsUserService.getMemberInfo(1001L,1002L);
         System.out.println(member);
     }
 

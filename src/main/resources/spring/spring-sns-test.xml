@@ -9,7 +9,7 @@ http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd
 http://www.springframework.org/schema/beans
 http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-    <mongo:mongo host="127.0.0.1" port="27017" id="memberMongo">
+    <mongo:mongo host="10.1.6.210" port="27001" id="memberMongo">
         <mongo:options connections-per-host="10"
                        threads-allowed-to-block-for-connection-multiplier="4"
                        connect-timeout="1000" max-wait-time="1500"
@@ -22,7 +22,7 @@ http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
         />
     </bean>
 
-    <mongo:mongo host="127.0.0.1" port="27017" id="followMongo">
+    <mongo:mongo host="10.1.6.210" port="27001" id="followMongo">
         <mongo:options connections-per-host="10"
                        threads-allowed-to-block-for-connection-multiplier="4"
                        connect-timeout="1000" max-wait-time="1500"
@@ -35,7 +35,7 @@ http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
         />
     </bean>
 
-    <mongo:mongo host="127.0.0.1" port="27017" id="messageMongo">
+    <mongo:mongo host="10.1.6.210" port="27001" id="messageMongo">
         <mongo:options connections-per-host="10"
                        threads-allowed-to-block-for-connection-multiplier="4"
                        connect-timeout="1000" max-wait-time="1500"
@@ -48,7 +48,7 @@ http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
         />
     </bean>
 
-    <mongo:mongo host="127.0.0.1" port="27017" id="postMongo">
+    <mongo:mongo host="10.1.6.210" port="27001" id="postMongo">
         <mongo:options connections-per-host="10"
                        threads-allowed-to-block-for-connection-multiplier="4"
                        connect-timeout="1000" max-wait-time="1500"
@@ -61,7 +61,7 @@ http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
         />
     </bean>
 
-    <mongo:mongo host="127.0.0.1" port="27017" id="commentMongo">
+    <mongo:mongo host="10.1.6.210" port="27001" id="commentMongo">
         <mongo:options connections-per-host="10"
                        threads-allowed-to-block-for-connection-multiplier="4"
                        connect-timeout="1000" max-wait-time="1500"
@@ -74,10 +74,23 @@ http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
         />
     </bean>
 
+    <mongo:mongo host="10.1.6.210" port="27001" id="collectionMongo">
+        <mongo:options connections-per-host="10"
+                       threads-allowed-to-block-for-connection-multiplier="4"
+                       connect-timeout="1000" max-wait-time="1500"
+                       auto-connect-retry="true" socket-timeout="1500" />
+    </mongo:mongo>
+
+    <bean id="collectionMongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg ref ="memberMongo" />
+        <constructor-arg name ="databaseName" value= "yesmynet"
+        />
+    </bean>
+
     <bean id="followRedisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
         <property name="connectionFactory">
             <bean class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
-                <property name="hostName" value="127.0.0.1" />
+                <property name="hostName" value="10.1.6.19" />
                 <property name="port" value="6379" />
                 <property name="poolConfig">
                     <bean class="redis.clients.jedis.JedisPoolConfig">
@@ -169,12 +182,16 @@ http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
     <bean id="commentDao" class="com.majun.sns.repository.dao.CommentDao">
         <property name="commentMongoTemplate" ref="commentMongoTemplate"/>
     </bean>
+    <bean id="collectionDao" class="com.majun.sns.repository.dao.CollectionDao">
+        <property name="collectionMongoTemplate" ref="collectionMongoTemplate"/>
+    </bean>
 
     <bean id="snsPostService" class="com.majun.sns.application.impl.SnsPostServiceImpl">
         <property name="postDao" ref="postDao"/>
         <property name="followDao" ref="followDao"/>
-        <property name="memberDao" ref="memberDao"/>
+        <property name="snsUserService" ref="snsUserService"/>
         <property name="commentDao" ref="commentDao"/>
+        <property name="collectionDao" ref="collectionDao"/>
 
         <property name="afterPostProcessor">
             <bean class="com.majun.sns.repository.dao.impl.MainProcess">

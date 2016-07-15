@@ -1,6 +1,7 @@
 package com.majun.sns.application.impl;
 
 import com.majun.sns.application.SnsPostService;
+import com.majun.sns.application.SnsUserService;
 import com.majun.sns.dto.Operation;
 import com.majun.sns.dto.PostType;
 import com.majun.sns.dto.ProcessParam;
@@ -28,17 +29,17 @@ public class SnsPostServiceImpl implements SnsPostService {
 
     private FollowDao followDao;
 
-    private MemberDao memberDao;
-
     private CommentDao commentDao;
 
     private CollectionDao collectionDao;
 
     private AfterProcessor afterPostProcessor;
 
+    private SnsUserService snsUserService;
+
     public AtomicInteger postIdCounter = new AtomicInteger(1000);
 
-    public List<Post> queryFollowPosts(Long memberId, PostType type, Long postId , Operation postIdOperation,int size) {
+    public List<Post> queryFollowPosts(Long loginMemberId,Long memberId, PostType type, Long postId , Operation postIdOperation,int size) {
 
         //查询所有的关注人
         List<Long> ids = followDao.findFollows(memberId,1,Integer.MAX_VALUE);
@@ -47,7 +48,7 @@ public class SnsPostServiceImpl implements SnsPostService {
         List<Post> posts = postDao.findPosts(ids,type,postId,postIdOperation,size);
 
         //封装用户信息
-        final Map<Long,Member> memberMap= memberDao.findMembers(ids);
+        final Map<Long,Member> memberMap= snsUserService.findMembers(loginMemberId,ids);
         posts = ClosureUtils.getValue(posts, new ClosureValue<Post, Post>() {
             public Post getValue(Post post) {
                 post.setMember(memberMap.get(post.getMemberId()));
@@ -58,11 +59,11 @@ public class SnsPostServiceImpl implements SnsPostService {
         return posts;
     }
 
-    public List<Post> queryPost(Long memberId, PostType type, Long postId, Operation postIdOperation, int size) {
+    public List<Post> queryPost(Long loginMemberId,Long memberId, PostType type, Long postId, Operation postIdOperation, int size) {
         List<Post> posts = postDao.findPosts(Arrays.asList(memberId),type,postId,postIdOperation,size);
 
         //封装用户信息
-        final Map<Long,Member> memberMap= memberDao.findMembers(Arrays.asList(memberId));
+        final Map<Long,Member> memberMap= snsUserService.findMembers(loginMemberId,Arrays.asList(memberId));
         posts = ClosureUtils.getValue(posts, new ClosureValue<Post, Post>() {
             public Post getValue(Post post) {
                 post.setMember(memberMap.get(post.getMemberId()));
@@ -86,7 +87,7 @@ public class SnsPostServiceImpl implements SnsPostService {
         commentDao.save(comment);
     }
 
-    public Result<Comment> getComments(Long postId,int pageNum,int pageSize) {
+    public Result<Comment> getComments(Long loginMemberId,Long postId,int pageNum,int pageSize) {
         Result<Comment> result = commentDao.queryComments(postId,pageNum,pageSize);
         if(!CollectionUtils.isEmpty(result.getResult())){
             final List<Long> memberIds = new ArrayList<Long>(2*pageSize);
@@ -99,7 +100,7 @@ public class SnsPostServiceImpl implements SnsPostService {
                     return comment.getMemberId();
                 }
             });
-            final Map<Long,Member> memberMap = memberDao.findMembers(memberIds);
+            final Map<Long,Member> memberMap = snsUserService.findMembers(loginMemberId,memberIds);
             ClosureUtils.getValue(result.getResult(), new ClosureValue<Comment, Comment>() {
                 public Comment getValue(Comment comment) {
                     if(comment.getReplyComment() != null){
@@ -165,10 +166,22 @@ public class SnsPostServiceImpl implements SnsPostService {
         return Long.parseLong(postIdStr);
     }
 
-    public Post getPost(Long postId) {
+    public Post getPost(Long loginMemberId,Long postId) {
         Post post = postDao.getPostById(postId);
-        post.setMember(memberDao.getMember(post.getMemberId()));
+        post.setMember(snsUserService.getMemberInfo(loginMemberId,post.getMemberId()));
         return post;
+    }
+
+    public List<Post> queryFollowPosts(Long memberId, PostType type, Long postId, Operation postIdOperation, int size) {
+        return this.queryFollowPosts(null,memberId,type,postId,postIdOperation,size);
+    }
+
+    public List<Post> queryPost(Long memberId, PostType type, Long postId, Operation postIdOperation, int size) {
+        return this.queryFollowPosts(null,type,postId,postIdOperation,size);
+    }
+
+    public Result getComments(Long postId, int pageNum, int pageSize) {
+        return this.getComments(null,postId,pageNum,pageSize);
     }
 
     public void setPostDao(PostDao postDao) {
@@ -177,10 +190,6 @@ public class SnsPostServiceImpl implements SnsPostService {
 
     public void setFollowDao(FollowDao followDao) {
         this.followDao = followDao;
-    }
-
-    public void setMemberDao(MemberDao memberDao) {
-        this.memberDao = memberDao;
     }
 
     public void setAfterPostProcessor(AfterProcessor afterPostProcessor) {
@@ -193,5 +202,9 @@ public class SnsPostServiceImpl implements SnsPostService {
 
     public void setCollectionDao(CollectionDao collectionDao) {
         this.collectionDao = collectionDao;
+    }
+
+    public void setSnsUserService(SnsUserService snsUserService) {
+        this.snsUserService = snsUserService;
     }
 }

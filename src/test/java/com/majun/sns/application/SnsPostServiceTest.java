@@ -54,7 +54,7 @@ public class SnsPostServiceTest {
         post.setType("article");
         post.setMemberId(2000L);
 
-        Member member = snsUserService.getMemberInfo(post.getMemberId());
+        Member member = snsUserService.getMemberInfo(null,post.getMemberId());
         post.setMember(member);
 
         System.out.println(snsPostService.post(post));
@@ -71,7 +71,7 @@ public class SnsPostServiceTest {
         post.setType("goods");
         post.setMemberId(1002L);
 
-        Member member = snsUserService.getMemberInfo(post.getMemberId());
+        Member member = snsUserService.getMemberInfo(null,post.getMemberId());
         post.setMember(member);
 
         System.out.println(snsPostService.post(post));
@@ -126,7 +126,7 @@ public class SnsPostServiceTest {
         post.setType(type);
         post.setMemberId(memberId);
 
-        Member member = snsUserService.getMemberInfo(post.getMemberId());
+        Member member = snsUserService.getMemberInfo(null,post.getMemberId());
         post.setMember(member);
 
         System.out.println(service.post(post));
@@ -137,14 +137,14 @@ public class SnsPostServiceTest {
     @Test
     public void queryFollowPosts(){
 
-        List<Post> list = snsPostService.queryFollowPosts(1001L, PostType.article,1607131454154871007L, Operation.lt,1002);
+        List<Post> list = snsPostService.queryFollowPosts(null,1001L, PostType.article,1607131454154871007L, Operation.lt,1002);
         System.out.println(list);
         System.out.println(list.size());
     }
 
     @Test
     public void queryPosts(){
-        List<Post> list = snsPostService.queryPost(2000L,PostType.article,1607131454155031011L,Operation.gt,5);
+        List<Post> list = snsPostService.queryPost(null,2000L,PostType.article,1607131454155031011L,Operation.gt,5);
         System.out.println(list);
         System.out.println(list.size());
     }
@@ -164,23 +164,23 @@ public class SnsPostServiceTest {
 
     @Test
     public void getComments(){
-        Result<Comment> request = snsPostService.getComments(1607131454155101013L,3,2);
+        Result<Comment> request = snsPostService.getComments(null,1607131454155101013L,3,2);
         System.out.println(request);
         System.out.println(request.getResult().get(0).getMember());
         System.out.println(request.getResult().get(0).getReplyComment());
         System.out.println(request.getResult().get(0).getReplyComment().getMember());
-        System.out.println(snsPostService.getComments(1607131454155101013L,4,2));
+        System.out.println(snsPostService.getComments(null,1607131454155101013L,4,2));
 
     }
 
     @Test
     public void getPost(){
-        System.out.println(snsPostService.getPost(1607131454155101013L));
+        System.out.println(snsPostService.getPost(null,1607131454155101013L));
     }
 
     @Test
     public void collect(){
-        List<Post> list = snsPostService.queryPost(2000L,PostType.article,null,null,100);
+        List<Post> list = snsPostService.queryPost(null,2000L,PostType.article,null,null,100);
         List<Long> postIds = ClosureUtils.getValue(list, new ClosureValue<Post, Long>() {
             public Long getValue(Post post) {
                 return post.getPostId();
@@ -190,7 +190,7 @@ public class SnsPostServiceTest {
             snsPostService.collect(1001L,postId);
         }
 
-        list = snsPostService.queryPost(2000L,PostType.goods,null,null,100);
+        list = snsPostService.queryPost(null,2000L,PostType.goods,null,null,100);
         postIds = ClosureUtils.getValue(list, new ClosureValue<Post, Long>() {
             public Long getValue(Post post) {
                 return post.getPostId();

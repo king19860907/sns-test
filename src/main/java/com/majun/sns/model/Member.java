@@ -1,5 +1,7 @@
 package com.majun.sns.model;
 
+import com.majun.sns.dto.FollowStatus;
+
 import java.io.Serializable;
 
 /**
@@ -53,6 +55,11 @@ public class Member implements Serializable {
      * 文章数量
      */
     private long articlePostNum;
+
+    /**
+     * 和当前用户的关注关系
+     */
+    private FollowStatus followStatus = FollowStatus.NONE;
 
     public Long getId() {
         return id;
@@ -126,12 +133,21 @@ public class Member implements Serializable {
         this.articlePostNum = articlePostNum;
     }
 
+    public FollowStatus getFollowStatus() {
+        return followStatus;
+    }
+
+    public void setFollowStatus(FollowStatus followStatus) {
+        this.followStatus = followStatus;
+    }
+
     @Override
     public String toString() {
         return "Member{" +
                 "id=" + id +
                 ", fansNum=" + fansNum +
                 ", followNum=" + followNum +
+                ", followStatus=" + followStatus +
                 '}';
     }
 }
