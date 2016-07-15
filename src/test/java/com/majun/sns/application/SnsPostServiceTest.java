@@ -175,6 +175,11 @@ public class SnsPostServiceTest {
     }
 
     @Test
+    public void collect(){
+        snsPostService.collect(1002L,1607151126533461007L);
+    }
+
+    @Test
     public void test(){
 
         //System.out.println(commentMongoTemplate.findAll(Comment.class));;

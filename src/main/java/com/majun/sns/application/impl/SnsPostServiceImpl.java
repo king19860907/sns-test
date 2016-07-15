@@ -5,16 +5,15 @@ import com.majun.sns.dto.Operation;
 import com.majun.sns.dto.PostType;
 import com.majun.sns.dto.ProcessParam;
 import com.majun.sns.dto.Result;
+import com.majun.sns.model.Collection;
 import com.majun.sns.model.Comment;
 import com.majun.sns.model.Member;
 import com.majun.sns.model.Post;
 import com.majun.sns.repository.dao.*;
 import com.majun.sns.util.DateUtil;
-import com.sun.corba.se.spi.orbutil.closure.Closure;
 import com.yesmynet.base.closure.ClosureUtils;
 import com.yesmynet.base.closure.ClosureValue;
 import org.bson.types.ObjectId;
-import org.omg.CORBA.Request;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -32,6 +31,8 @@ public class SnsPostServiceImpl implements SnsPostService {
     private MemberDao memberDao;
 
     private CommentDao commentDao;
+
+    private CollectionDao collectionDao;
 
     private AfterProcessor afterPostProcessor;
 
@@ -113,6 +114,20 @@ public class SnsPostServiceImpl implements SnsPostService {
         return result;
     }
 
+    public void collect(Long memberId, Long postId) {
+
+        Collection collection = new Collection();
+        Post post = postDao.getPostById(postId);
+        if(post != null){
+            collection.setMemberId(memberId);
+            collection.setPostId(postId);
+            collection.setType(post.getType());
+            collection.setCreateTime(new Date());
+            collectionDao.saveCollection(collection);
+        }
+
+    }
+
     public void getCollections() {
 
     }
@@ -165,5 +180,9 @@ public class SnsPostServiceImpl implements SnsPostService {
 
     public void setCommentDao(CommentDao commentDao) {
         this.commentDao = commentDao;
+    }
+
+    public void setCollectionDao(CollectionDao collectionDao) {
+        this.collectionDao = collectionDao;
     }
 }

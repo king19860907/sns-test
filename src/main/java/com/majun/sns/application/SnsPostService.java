@@ -46,6 +46,8 @@ public interface SnsPostService {
 
     Result getComments(Long postId,int pageNum,int pageSize);
 
+    void collect(Long memberId,Long postId);
+
     void getCollections();
 
     Long post(Post post);
