@@ -48,6 +48,13 @@ public interface SnsPostService {
 
     void collect(Long memberId,Long postId);
 
+    /**
+     * 取消收藏
+     * @param memberId
+     * @param ids
+     */
+    void unCollect(Long memberId,List<String> ids);
+
     void getCollections();
 
     Long post(Post post);

@@ -128,6 +128,15 @@ public class SnsPostServiceImpl implements SnsPostService {
 
     }
 
+    public void unCollect(Long memberId, List<String> idStrs) {
+        List<ObjectId> ids = ClosureUtils.getValue(idStrs, new ClosureValue<String, ObjectId>() {
+            public ObjectId getValue(String s) {
+                return new ObjectId(s);
+            }
+        });
+        collectionDao.removeCollection(memberId,ids);
+    }
+
     public void getCollections() {
 
     }
