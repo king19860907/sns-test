@@ -59,6 +59,14 @@ public class SnsUserServiceImpl implements SnsUserService {
         return Collections.EMPTY_MAP;
     }
 
+    public Map<Long, Member> findMembers(Collection<Long> memberIds) {
+        return this.findMembers(null,memberIds);
+    }
+
+    public Member getMemberInfo(Long memberId) {
+        return this.getMemberInfo(null,memberId);
+    }
+
     public void follow(Long memberId, Long toMemberid) {
         FollowStatus status = followDao.followStatus(memberId,toMemberid);
         if(status.equals(FollowStatus.NONE) || status.equals(FollowStatus.FANS)){

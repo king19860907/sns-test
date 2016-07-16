@@ -15,7 +15,6 @@ public interface SnsPostService {
 
     /**
      * 查询某个用户关注人发布的内容
-     * @param loginMemberId //当前登录的用户  如果为空或者和memberId相同则返回的用户信息中关注关系为NONE
      * @param memberId
      * @param type      类型:酒评还是文章
      * @param postId    内容Id
@@ -23,8 +22,6 @@ public interface SnsPostService {
      * @param size
      * @return
      */
-    List<Post> queryFollowPosts(Long loginMemberId,Long memberId, PostType type, Long postId , Operation postIdOperation,int size);
-
     List<Post> queryFollowPosts(Long memberId, PostType type, Long postId , Operation postIdOperation,int size);
 
     /**

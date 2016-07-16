@@ -39,7 +39,7 @@ public class SnsPostServiceImpl implements SnsPostService {
 
     public AtomicInteger postIdCounter = new AtomicInteger(1000);
 
-    public List<Post> queryFollowPosts(Long loginMemberId,Long memberId, PostType type, Long postId , Operation postIdOperation,int size) {
+    public List<Post> queryFollowPosts(Long memberId, PostType type, Long postId , Operation postIdOperation,int size) {
 
         //查询所有的关注人
         List<Long> ids = followDao.findFollows(memberId,1,Integer.MAX_VALUE);
@@ -48,7 +48,7 @@ public class SnsPostServiceImpl implements SnsPostService {
         List<Post> posts = postDao.findPosts(ids,type,postId,postIdOperation,size);
 
         //封装用户信息
-        final Map<Long,Member> memberMap= snsUserService.findMembers(loginMemberId,ids);
+        final Map<Long,Member> memberMap= snsUserService.findMembers(memberId,ids);
         posts = ClosureUtils.getValue(posts, new ClosureValue<Post, Post>() {
             public Post getValue(Post post) {
                 post.setMember(memberMap.get(post.getMemberId()));
@@ -170,10 +170,6 @@ public class SnsPostServiceImpl implements SnsPostService {
         Post post = postDao.getPostById(postId);
         post.setMember(snsUserService.getMemberInfo(loginMemberId,post.getMemberId()));
         return post;
-    }
-
-    public List<Post> queryFollowPosts(Long memberId, PostType type, Long postId, Operation postIdOperation, int size) {
-        return this.queryFollowPosts(null,memberId,type,postId,postIdOperation,size);
     }
 
     public List<Post> queryPost(Long memberId, PostType type, Long postId, Operation postIdOperation, int size) {
