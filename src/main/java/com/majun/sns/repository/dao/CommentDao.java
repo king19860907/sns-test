@@ -24,7 +24,7 @@ public class CommentDao {
     public Result<Comment> queryComments(Long postId,int pageNum,int pageSize){
         Result<Comment> result = new Result<Comment>();
         Query query = new BasicQuery("{postId:"+postId+"}");
-        result.setTotalCount(commentMongoTemplate.find(query,Comment.class).size());
+        result.setTotalCount(commentMongoTemplate.count(query,Comment.class));
 
         query.skip((pageNum-1)*pageSize).limit(pageSize);
         query.with(new Sort(Sort.Direction.ASC,"createTime"));

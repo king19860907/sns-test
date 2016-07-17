@@ -68,7 +68,14 @@ public interface SnsPostService {
      */
     void unCollect(Long memberId,List<String> ids);
 
-    void getCollections();
+    /**
+     * 获取某个用户收藏的内容
+     * @param memberId
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    Result<Post> getCollections(Long memberId,PostType type,int pageNum,int pageSize);
 
     Long post(Post post);
 

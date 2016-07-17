@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -49,6 +50,10 @@ public class PostDao {
     public Post getPostById(Long postId){
         Query query = new BasicQuery("{postId:"+postId+"}");
         return postMongoTemplate.findOne(query,Post.class);
+    }
+
+    public List<Post> findPosts(Collection<Long> ids){
+        return postMongoTemplate.find(Query.query(Criteria.where("postId").in(ids)),Post.class);
     }
 
     public void setPostMongoTemplate(MongoTemplate postMongoTemplate) {

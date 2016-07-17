@@ -137,7 +137,7 @@ public class SnsPostServiceTest {
     @Test
     public void queryFollowPosts(){
 
-        List<Post> list = snsPostService.queryFollowPosts(null,1001L, PostType.article,1607131454154871007L, Operation.lt,1002);
+        List<Post> list = snsPostService.queryFollowPosts(1001L, PostType.article,1607131454154871007L, Operation.lt,1002);
         System.out.println(list);
         System.out.println(list.size());
     }

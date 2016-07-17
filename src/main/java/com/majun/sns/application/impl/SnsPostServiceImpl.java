@@ -138,9 +138,17 @@ public class SnsPostServiceImpl implements SnsPostService {
         collectionDao.removeCollection(memberId,ids);
     }
 
-    public void getCollections() {
+    public Result<Post> getCollections(Long memberId,PostType type,int pageNum,int pageSize) {
+        Result<Collection> result = collectionDao.queryCollections(memberId,type,pageNum,pageSize);
+        List<Long> postIds = ClosureUtils.getValue(result.getResult(), new ClosureValue<Collection, Long>() {
+            public Long getValue(Collection collection) {
+                return collection.getPostId();
+            }
+        });
 
+        return null;
     }
+
 
     public Long post(Post post) {
         Long postId = generatePostId();
